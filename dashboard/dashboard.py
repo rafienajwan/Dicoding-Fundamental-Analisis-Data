@@ -69,11 +69,14 @@ with st.sidebar:
 # Load data dengan path yang fleksibel
 @st.cache_data
 def load_data():
+    import os
+    
     # Coba beberapa kemungkinan path
     possible_paths = [
+        'data/day.csv',  # Untuk Streamlit Cloud (root repo)
         './data/day.csv',
         '../data/day.csv',
-        'data/day.csv',
+        os.path.join(os.path.dirname(__file__), '..', 'data', 'day.csv'),  # Relative to dashboard.py
     ]
     
     day_df = None
@@ -84,11 +87,12 @@ def load_data():
             day_df = pd.read_csv(path)
             hour_df = pd.read_csv(path.replace('day.csv', 'hour.csv'))
             break
-        except:
+        except Exception as e:
             continue
     
     if day_df is None:
         st.error("❌ File data tidak ditemukan! Pastikan file day.csv dan hour.csv ada di folder 'data/'")
+        st.error(f"Tried paths: {possible_paths}")
         st.stop()
     
     # Data cleaning
@@ -96,6 +100,10 @@ def load_data():
     hour_df.drop_duplicates(inplace=True)
     day_df['season'] = day_df['season'].astype('category')
     hour_df['season'] = hour_df['season'].astype('category')
+    
+    # Konversi datetime
+    day_df['dteday'] = pd.to_datetime(day_df['dteday'])
+    hour_df['dteday'] = pd.to_datetime(hour_df['dteday'])
     
     # Konversi suhu ke Celsius
     day_df['temp_celsius'] = day_df['temp'] * 41
@@ -136,8 +144,8 @@ with st.sidebar:
 day_filtered = day_df[
     (day_df['season_name'].isin(selected_season)) &
     (day_df['weather_name'].isin(selected_weather))
-]
-hour_filtered = hour_df[hour_df['season_name'].isin(selected_season)]
+].copy()
+hour_filtered = hour_df[hour_df['season_name'].isin(selected_season)].copy()
 
 # ========== HALAMAN OVERVIEW ==========
 if page == "📊 Overview":
@@ -601,7 +609,7 @@ elif page == "🔍 Analisis Lanjutan":
         
         with col2:
             # Trend bulanan
-            day_filtered['month'] = pd.to_datetime(day_filtered['dteday']).dt.month
+            day_filtered['month'] = day_filtered['dteday'].dt.month
             monthly_users = day_filtered.groupby('month')[['casual', 'registered']].mean()
             
             fig, ax = plt.subplots(figsize=(8, 6))
