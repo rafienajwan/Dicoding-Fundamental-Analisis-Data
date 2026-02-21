@@ -194,11 +194,11 @@ if page == "📊 Overview":
     
     with col1:
         st.subheader("📅 Dataset Harian (day.csv)")
-        st.dataframe(day_filtered.head(10), use_container_width=True)
+        st.dataframe(day_filtered.head(10), width='stretch')
         
     with col2:
         st.subheader("🕐 Dataset Per Jam (hour.csv)")
-        st.dataframe(hour_filtered.head(10), use_container_width=True)
+        st.dataframe(hour_filtered.head(10), width='stretch')
     
     # Matriks Korelasi
     st.markdown('<h2 class="sub-header">🔗 Matriks Korelasi</h2>', unsafe_allow_html=True)
@@ -754,7 +754,7 @@ elif page == "🔍 Analisis Lanjutan":
                 'casual_mean': '{:.0f}',
                 'registered_mean': '{:.0f}'
             }),
-            use_container_width=True
+            width='stretch'
         )
 
 # ========== HALAMAN KESIMPULAN ==========
