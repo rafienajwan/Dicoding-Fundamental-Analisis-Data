@@ -1,7 +1,8 @@
 numpy
-scikit-learn
-matplotlib
 pandas
+matplotlib
 seaborn
+scikit-learn
 streamlit
-altair<5
+altair==4.2.2
+protobuf==3.20.3
