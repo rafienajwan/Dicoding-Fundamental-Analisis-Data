@@ -1,9 +1,12 @@
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive backend untuk Streamlit Cloud
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
 import numpy as np
-from pathlib import Path
+import warnings
+warnings.filterwarnings('ignore')
 
 # Konfigurasi halaman
 st.set_page_config(
@@ -96,14 +99,16 @@ def load_data():
         st.stop()
     
     # Data cleaning
-    day_df.drop_duplicates(inplace=True)
-    hour_df.drop_duplicates(inplace=True)
-    day_df['season'] = day_df['season'].astype('category')
-    hour_df['season'] = hour_df['season'].astype('category')
+    day_df = day_df.drop_duplicates()
+    hour_df = hour_df.drop_duplicates()
+    day_df = day_df.copy()  # Ensure we have a copy
+    hour_df = hour_df.copy()
     
     # Konversi datetime
-    day_df['dteday'] = pd.to_datetime(day_df['dteday'])
-    hour_df['dteday'] = pd.to_datetime(hour_df['dteday'])
+    day_df['dteday'] = pd.to_datetime(day_df['dteday'], errors='coerce')
+    hour_df['dteday'] = pd.to_datetime(hour_df['dteday'], errors='coerce')
+    day_df['season'] = day_df['season'].astype('category')
+    hour_df['season'] = hour_df['season'].astype('category')
     
     # Konversi suhu ke Celsius
     day_df['temp_celsius'] = day_df['temp'] * 41
